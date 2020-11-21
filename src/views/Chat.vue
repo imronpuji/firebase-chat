@@ -57,15 +57,7 @@ export default {
         //     }
         // })
         const db = this.$firebase.firestore();
-        db
-            .collection('test')
-            .add({
-                nama: 'imron'
-            })
-            .then(() => {})
-            .catch(() => this.$router.replace({
-                path: '/login'
-            }))
+       
 
         db.collection('users').get().then((data) => {
             const pushUserData = []
@@ -84,9 +76,6 @@ export default {
             })
         },
         
-        test(val){
-            console.log(val)        
-        },
 
         buatObrolan(uid, nama) {
                     console.log(this.$store.state.test)
@@ -118,7 +107,7 @@ export default {
             const pushLastChat = []
             var uidChat = user.user.uid < this.client.uid ? user.user.uid + this.client.uid : this.client.uid + user.user.uid
             Promise.all([
-                citiesRef.doc(uidChat).collection('messages').get().then(res => {
+                citiesRef.doc(uidChat).collection('messages').orderBy('created','asc').get().then(res => {
                     res.forEach((doc) => {
                         pushLastChat.push(doc.data())
                         this.$store.commit('chat', pushLastChat)
@@ -127,9 +116,9 @@ export default {
             ])
 
             
-                this.$firebase.firestore().collection('chat').doc(uidChat).collection('messages').doc('createRoom').set({room:'created'})
-                .then(() => {
-                   
+                this.$firebase.firestore().collection('chat').doc(uidChat).collection('messages').doc('createRoom').set({room:'created', created:this.$firebase.firestore.FieldValue.serverTimestamp()})
+                .then((res) => {
+                   console.log(res)
                 })
                 .catch(err => err)
 
@@ -155,7 +144,7 @@ export default {
                     pengirim: user.user.uid,
                     penerima : this.client.uid,
                     nama_pengirim : user.user.displayName,
-                    created : this.$firebase.database.ServerValue.TIMESTAMP 
+                    created : this.$firebase.firestore.FieldValue.serverTimestamp()
             
                 })
                 .then(() => {

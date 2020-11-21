@@ -72,6 +72,7 @@ export default {
         .then((data) => {
           this.$router.replace({ path: "/chat" });
           localStorage.setItem('data', JSON.stringify(data))
+          window.location.reload()
           console.log(data)
         })
         .catch(err => {
